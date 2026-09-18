@@ -42,6 +42,12 @@ async function upsertVenue(name: string, city: string, address: string) {
 }
 
 async function main() {
+  const existingGames = await prisma.game.count();
+  if (existingGames > 0) {
+    console.log(`Database already has ${existingGames} game(s) — skipping seed.`);
+    return;
+  }
+
   console.log("Seeding…");
 
   const sumeet = await upsertUser({

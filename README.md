@@ -2,6 +2,10 @@
 
 A pickup-sports game booking platform inspired by [kasakai.in](https://www.kasakai.in): hosts create scheduled games at a venue, and other players discover and book individual spots — not the whole venue.
 
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/subsumeet-collab/game-booking-platform)
+
+Click the button above (or see **Deploying to Render** below) to get a live URL on Render's free tier in a couple of minutes.
+
 ## Stack
 
 - **Next.js 14** (App Router, TypeScript)
@@ -36,6 +40,16 @@ Visit `http://localhost:3000`.
 | `kanha@kasakai.demo` | Host + player | Hosts several seeded games. |
 | `karan@kasakai.demo` | Host + player | Hosts several seeded games. |
 | `player1@kasakai.demo` … `player14@kasakai.demo` | Player | Prefilled wallet balances. |
+
+## Deploying to Render
+
+This repo includes a `render.yaml` blueprint.
+
+1. Click the **Deploy to Render** badge above (or in the Render dashboard: **New +** → **Blueprint**, and point it at this repo).
+2. Render provisions a free web service and runs the build. First deploy takes a few minutes.
+3. Once live, your URL is `https://game-booking-platform.onrender.com` (or a Render-assigned variant if that name is taken — update the `NEXTAUTH_URL` env var on the service to match, then redeploy).
+
+**Persistence note:** the deployed app uses SQLite on the free plan's ephemeral disk, and the start command re-seeds automatically whenever the database is empty (e.g. after a cold start following Render's free-tier spin-down). That means bookings/wallet changes you make live may reset after a period of inactivity — fine for demoing the product, not for real usage. For persistent data, point `DATABASE_URL` at a real Postgres instance (Render's own Postgres, Neon, Supabase, etc.) and re-run `npx prisma migrate deploy` against it.
 
 ## Project layout
 
