@@ -26,7 +26,9 @@ export default async function CompletedGamesPage() {
       format: b.game.format,
       status: "COMPLETED",
       guestCount: b.guestCount,
-      totalPaid: b.totalPaid,
+      amountDue: b.amountDue,
+      paid: b.paid,
+      forfeited: b.forfeited,
       cancellable: false,
     }));
 

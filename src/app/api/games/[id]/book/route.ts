@@ -36,30 +36,15 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     );
   }
 
-  const total = needed * game.pricePerSpot;
-
-  const user = await prisma.user.findUnique({ where: { id: session.user.id } });
-  if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
-  if (user.walletBalance < total) {
-    return NextResponse.json({ error: "Insufficient wallet balance." }, { status: 400 });
-  }
-
-  const booking = await prisma.$transaction(async (tx) => {
-    const created = await tx.booking.create({
-      data: {
-        gameId: game.id,
-        userId: user.id,
-        status: "CONFIRMED",
-        guestCount,
-        totalPaid: total,
-        note,
-      },
-    });
-    await tx.user.update({ where: { id: user.id }, data: { walletBalance: { decrement: total } } });
-    await tx.walletTransaction.create({
-      data: { userId: user.id, type: "BOOKING_PAYMENT", amount: -total, note: `Booked: ${game.title}` },
-    });
-    return created;
+  const booking = await prisma.booking.create({
+    data: {
+      gameId: game.id,
+      userId: session.user.id,
+      status: "CONFIRMED",
+      guestCount,
+      amountDue: needed * game.pricePerSpot,
+      note,
+    },
   });
 
   return NextResponse.json({ booking }, { status: 201 });

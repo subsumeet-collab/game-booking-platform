@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { GameCardData } from "@/components/GameCard";
 
@@ -8,7 +8,6 @@ const MAX_GUESTS = 4;
 
 export function BookingModal({ game, onClose }: { game: GameCardData; onClose: () => void }) {
   const router = useRouter();
-  const [wallet, setWallet] = useState<number | null>(null);
   const [guestCount, setGuestCount] = useState(0);
   const [note, setNote] = useState("");
   const [prefsOpen, setPrefsOpen] = useState(false);
@@ -18,15 +17,7 @@ export function BookingModal({ game, onClose }: { game: GameCardData; onClose: (
 
   const isFull = game.badge === "FULL";
   const maxAddableGuests = Math.max(0, Math.min(MAX_GUESTS, game.spotsLeft - 1));
-  const totalFee = game.pricePerSpot * (1 + guestCount);
-  const afterPayment = wallet === null ? null : wallet - totalFee;
-
-  useEffect(() => {
-    fetch("/api/me")
-      .then((r) => r.json())
-      .then((d) => setWallet(d.walletBalance))
-      .catch(() => setWallet(0));
-  }, []);
+  const amountDue = game.pricePerSpot * (1 + guestCount);
 
   async function handleConfirm() {
     setSubmitting(true);
@@ -70,7 +61,7 @@ export function BookingModal({ game, onClose }: { game: GameCardData; onClose: (
 
   return (
     <Overlay onClose={onClose}>
-      <p className="text-xs uppercase text-muted mb-1">{isFull ? "Join Waitlist" : "Book"}</p>
+      <p className="text-xs uppercase text-muted mb-1">{isFull ? "Join Waitlist" : "Confirm Spot"}</p>
       <h2 className="text-2xl font-bold mb-4 leading-tight">
         {game.venueName}
         <br />
@@ -144,49 +135,22 @@ export function BookingModal({ game, onClose }: { game: GameCardData; onClose: (
             </div>
           </div>
 
-          <div className="bg-panel2 border border-border rounded-lg p-4 mb-4 flex items-center justify-between">
-            <div>
-              <p className="text-[10px] uppercase text-muted">Total Fee</p>
-              <p className="text-2xl font-black text-accent">₹{totalFee}</p>
-              <p className="text-xs text-muted">Wallet: ₹{wallet ?? "…"}</p>
-            </div>
-            {afterPayment !== null && (
-              <div className="text-right">
-                <p className="text-[10px] uppercase text-muted">After payment</p>
-                <p className={`text-lg font-bold ${afterPayment < 0 ? "text-danger" : "text-white"}`}>
-                  {afterPayment < 0 ? "-" : ""}₹{Math.abs(afterPayment)}
-                </p>
-              </div>
-            )}
+          <div className="bg-panel2 border border-border rounded-lg p-4 mb-4">
+            <p className="text-[10px] uppercase text-muted">Amount Due</p>
+            <p className="text-2xl font-black text-accent">₹{amountDue}</p>
+            <p className="text-xs text-muted mt-1">
+              Pay the host directly — they'll mark you as paid once settled.
+            </p>
           </div>
 
-          {afterPayment !== null && afterPayment < 0 && (
-            <p className="text-sm text-danger mb-4">
-              Insufficient balance.{" "}
-              <a href="/wallet" className="underline font-semibold">
-                Recharge your wallet
-              </a>
-            </p>
-          )}
-
-          <p className="text-xs text-muted mb-4">
-            Cancellation charges apply to this game. {game.cancellationPolicy}
-          </p>
+          <p className="text-xs text-muted mb-4">{game.cancellationPolicy}</p>
         </>
       )}
 
       {error && <p className="text-sm text-danger mb-3">{error}</p>}
 
-      <button
-        className="btn-primary w-full"
-        disabled={submitting || (!isFull && afterPayment !== null && afterPayment < 0)}
-        onClick={handleConfirm}
-      >
-        {submitting
-          ? "Processing…"
-          : isFull
-            ? "Join Waitlist"
-            : `Confirm & Pay ₹${totalFee}`}
+      <button className="btn-primary w-full" disabled={submitting} onClick={handleConfirm}>
+        {submitting ? "Processing…" : isFull ? "Join Waitlist" : "Confirm Spot"}
       </button>
     </Overlay>
   );

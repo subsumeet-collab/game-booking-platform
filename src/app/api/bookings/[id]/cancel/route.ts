@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { tryPromoteWaitlist } from "@/lib/booking";
 
-const FULL_REFUND_WINDOW_HOURS = 4;
+const FEE_WAIVER_WINDOW_HOURS = 4;
 
 export async function POST(_req: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
@@ -19,31 +19,15 @@ export async function POST(_req: Request, { params }: { params: { id: string } }
 
   const wasConfirmed = booking.status === "CONFIRMED";
   const hoursUntil = (booking.game.date.getTime() - Date.now()) / 3_600_000;
-  const refund = wasConfirmed && hoursUntil >= FULL_REFUND_WINDOW_HOURS ? booking.totalPaid : 0;
+  // Cancel late and the fee is still owed to the host, even though the booking itself is cancelled.
+  const forfeited = wasConfirmed && !booking.paid && hoursUntil < FEE_WAIVER_WINDOW_HOURS;
 
-  await prisma.$transaction(async (tx) => {
-    await tx.booking.update({
-      where: { id: booking.id },
-      data: { status: "CANCELLED", cancelledAt: new Date() },
-    });
-    if (refund > 0) {
-      await tx.user.update({ where: { id: booking.userId }, data: { walletBalance: { increment: refund } } });
-      await tx.walletTransaction.create({
-        data: {
-          userId: booking.userId,
-          type: "REFUND",
-          amount: refund,
-          note: `Refund: ${booking.game.title}`,
-        },
-      });
-    }
+  await prisma.booking.update({
+    where: { id: booking.id },
+    data: { status: "CANCELLED", cancelledAt: new Date(), forfeited },
   });
 
   if (wasConfirmed) await tryPromoteWaitlist(booking.gameId);
 
-  return NextResponse.json({
-    ok: true,
-    refunded: refund,
-    forfeited: wasConfirmed && refund === 0 ? booking.totalPaid : 0,
-  });
+  return NextResponse.json({ ok: true, forfeited });
 }

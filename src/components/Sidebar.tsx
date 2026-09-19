@@ -10,7 +10,7 @@ const NAV = [
   { href: "/bookings/cancelled", label: "Cancelled Events", icon: "⛔" },
   { href: "/bookings/completed", label: "Completed Games", icon: "✅" },
   { href: "/feedback", label: "My Feedback", icon: "⭐" },
-  { href: "/wallet", label: "Wallet", icon: "💰" },
+  { href: "/payments", label: "Outstanding Payments", icon: "💳" },
   { href: "/faq", label: "FAQ", icon: "❓" },
   { href: "/notifications", label: "Notifications", icon: "🔔" },
   { href: "/profile", label: "Profile", icon: "👤" },
@@ -19,18 +19,16 @@ const NAV = [
 export function Sidebar({
   user,
 }: {
-  user: { name: string; walletBalance: number; isHost: boolean };
+  user: { name: string; isHost: boolean };
 }) {
   const pathname = usePathname();
 
   return (
     <aside className="w-64 shrink-0 bg-panel border-r border-border min-h-screen flex flex-col">
       <div className="p-5 border-b border-border">
-        <div className="bg-white text-black font-black text-xs px-2 py-1 inline-block leading-tight">
-          KASA
-          <br />
-          KAI
-        </div>
+        <span className="text-lg font-black tracking-tight">
+          Game<span className="text-accent">Booking</span>
+        </span>
       </div>
 
       <nav className="flex-1 py-3">
@@ -80,13 +78,6 @@ export function Sidebar({
               Log out
             </button>
           </div>
-        </div>
-        <div className="card !p-3">
-          <p className="text-xs uppercase text-muted mb-1">Wallet Balance</p>
-          <p className="text-lg font-bold text-accent">₹{user.walletBalance}</p>
-          <Link href="/wallet" className="btn-primary w-full text-center block mt-2 !py-2">
-            + Top Up
-          </Link>
         </div>
       </div>
     </aside>

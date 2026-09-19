@@ -30,7 +30,9 @@ export default async function MyBookingsPage() {
       format: b.game.format,
       status: b.status as BookingRowData["status"],
       guestCount: b.guestCount,
-      totalPaid: b.totalPaid,
+      amountDue: b.amountDue,
+      paid: b.paid,
+      forfeited: b.forfeited,
       cancellable: true,
     }));
 

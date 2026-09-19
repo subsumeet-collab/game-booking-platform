@@ -13,7 +13,9 @@ export type BookingRowData = {
   format: string;
   status: "CONFIRMED" | "WAITLISTED" | "CANCELLED" | "COMPLETED";
   guestCount: number;
-  totalPaid: number;
+  amountDue: number;
+  paid: boolean;
+  forfeited: boolean;
   cancellable: boolean;
 };
 
@@ -43,11 +45,16 @@ export function BookingRow({ booking }: { booking: BookingRowData }) {
     router.refresh();
   }
 
+  const owesMoney = booking.amountDue > 0 && !booking.paid && (booking.status === "CONFIRMED" || booking.forfeited);
+
   return (
     <div className="card flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
       <div className="min-w-0">
-        <div className="flex items-center gap-2 mb-1">
+        <div className="flex items-center gap-2 mb-1 flex-wrap">
           <span className={`pill border text-[10px] ${STATUS_STYLES[booking.status]}`}>{booking.status}</span>
+          {booking.forfeited && (
+            <span className="pill border text-[10px] bg-warn/20 text-warn border-warn">FEE OWED</span>
+          )}
           <h3 className="font-bold truncate">{booking.gameTitle}</h3>
         </div>
         <p className="text-sm text-muted">
@@ -60,7 +67,14 @@ export function BookingRow({ booking }: { booking: BookingRowData }) {
         {error && <p className="text-sm text-danger mt-1">{error}</p>}
       </div>
       <div className="flex items-center gap-4 shrink-0">
-        {booking.totalPaid > 0 && <span className="font-bold">₹{booking.totalPaid}</span>}
+        {booking.amountDue > 0 && (
+          <div className="text-right">
+            <span className="font-bold">₹{booking.amountDue}</span>
+            <p className={`text-xs ${owesMoney ? "text-warn" : "text-live"}`}>
+              {booking.paid ? "Paid" : owesMoney ? "Unpaid" : ""}
+            </p>
+          </div>
+        )}
         {booking.cancellable && (
           <button onClick={cancel} disabled={loading} className="btn-secondary !py-2">
             {loading ? "Cancelling…" : "Cancel"}

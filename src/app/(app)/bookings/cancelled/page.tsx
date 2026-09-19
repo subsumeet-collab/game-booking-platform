@@ -23,7 +23,9 @@ export default async function CancelledEventsPage() {
     format: b.game.format,
     status: "CANCELLED",
     guestCount: b.guestCount,
-    totalPaid: 0,
+    amountDue: b.amountDue,
+    paid: b.paid,
+    forfeited: b.forfeited,
     cancellable: false,
   }));
 

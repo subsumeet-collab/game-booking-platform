@@ -10,22 +10,19 @@ datasource db {
 // SQLite has no native enum support, so these are plain strings.
 // GameStatus: UPCOMING | CANCELLED | COMPLETED (LIVE/FULL are derived at read time, see src/lib/game.ts)
 // BookingStatus: CONFIRMED | WAITLISTED | CANCELLED | COMPLETED
-// WalletTxnType: TOPUP | BOOKING_PAYMENT | REFUND
 
 model User {
-  id            String    @id @default(cuid())
-  name          String
-  email         String    @unique
-  passwordHash  String
-  city          String    @default("Mumbai")
-  walletBalance Int       @default(0) // paise-free rupees, integer
-  isHost        Boolean   @default(false)
-  createdAt     DateTime  @default(now())
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  city         String   @default("Mumbai")
+  isHost       Boolean  @default(false)
+  createdAt    DateTime @default(now())
 
-  hostedGames    Game[]            @relation("HostedGames")
-  bookings       Booking[]
-  walletTxns     WalletTransaction[]
-  feedback       Feedback[]
+  hostedGames Game[]     @relation("HostedGames")
+  bookings    Booking[]
+  feedback    Feedback[]
 
   @@map("users")
 }
@@ -42,15 +39,15 @@ model Venue {
 }
 
 model Game {
-  id         String     @id @default(cuid())
-  title      String
-  format     String // e.g. "6v6"
-  date       DateTime
-  durationMin Int       @default(60)
-  pricePerSpot Int
-  capacity   Int
-  status     String     @default("UPCOMING")
-  cancellationPolicy String @default("Cancel up to 4 hours before kickoff for a full refund. Later cancellations forfeit the spot fee.")
+  id                 String   @id @default(cuid())
+  title              String
+  format             String // e.g. "6v6"
+  date               DateTime
+  durationMin        Int      @default(60)
+  pricePerSpot       Int
+  capacity           Int
+  status             String   @default("UPCOMING")
+  cancellationPolicy String   @default("Cancel up to 4 hours before kickoff to be let off the hook for the spot fee. Later cancellations still owe the fee.")
 
   venue   Venue  @relation(fields: [venueId], references: [id])
   venueId String
@@ -66,12 +63,14 @@ model Game {
 }
 
 model Booking {
-  id        String        @id @default(cuid())
-  status    String        @default("CONFIRMED")
-  guestCount Int          @default(0)
-  totalPaid Int           @default(0)
-  note      String        @default("")
-  createdAt DateTime      @default(now())
+  id          String   @id @default(cuid())
+  status      String   @default("CONFIRMED")
+  guestCount  Int      @default(0)
+  amountDue   Int      @default(0)
+  paid        Boolean  @default(false)
+  forfeited   Boolean  @default(false) // cancelled too late — fee is still owed
+  note        String   @default("")
+  createdAt   DateTime @default(now())
   cancelledAt DateTime?
 
   game   Game   @relation(fields: [gameId], references: [id])
@@ -81,19 +80,6 @@ model Booking {
   userId String
 
   @@map("bookings")
-}
-
-model WalletTransaction {
-  id        String        @id @default(cuid())
-  type      String
-  amount    Int // positive = credit, negative = debit
-  note      String        @default("")
-  createdAt DateTime      @default(now())
-
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
-
-  @@map("wallet_transactions")
 }
 
 model Feedback {

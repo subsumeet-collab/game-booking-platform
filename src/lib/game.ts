@@ -16,6 +16,18 @@ export function isFull(game: GameWithBookings): boolean {
   return spotsLeft(game) <= 0;
 }
 
+/** Bookings that still owe (or paid) money for this game: confirmed spots, plus late cancellations that forfeited the fee. */
+export function payableBookings<B extends Booking>(game: Game & { bookings: B[] }): B[] {
+  return game.bookings.filter((b) => b.status === "CONFIRMED" || b.forfeited);
+}
+
+export function paymentTotals(game: GameWithBookings): { due: number; paid: number; outstanding: number } {
+  const payable = payableBookings(game);
+  const due = payable.reduce((sum, b) => sum + b.amountDue, 0);
+  const paid = payable.filter((b) => b.paid).reduce((sum, b) => sum + b.amountDue, 0);
+  return { due, paid, outstanding: due - paid };
+}
+
 export type GameBadge = "LIVE" | "TODAY" | "TOMORROW" | "UPCOMING" | "FULL" | "COMPLETED" | "CANCELLED";
 
 /** Badge shown on the game card: cancelled/completed win, then FULL, then a time-relative badge. */

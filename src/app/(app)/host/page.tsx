@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { formatGameDate, formatGameTime, spotsTaken } from "@/lib/game";
+import { formatGameDate, formatGameTime, spotsTaken, paymentTotals } from "@/lib/game";
 import { CreateGameForm } from "@/components/CreateGameForm";
 import { HostGameRow, type HostGameRowData } from "@/components/HostGameRow";
 
@@ -18,20 +18,26 @@ export default async function HostPage() {
   });
 
   const now = Date.now();
-  const rows: HostGameRowData[] = games.map((g) => ({
-    id: g.id,
-    title: g.title,
-    venueName: g.venue.name,
-    city: g.venue.city,
-    dateLabel: formatGameDate(g.date),
-    timeLabel: formatGameTime(g.date),
-    format: g.format,
-    pricePerSpot: g.pricePerSpot,
-    spotsTaken: spotsTaken(g),
-    capacity: g.capacity,
-    cancelled: g.status === "CANCELLED",
-    past: g.date.getTime() + g.durationMin * 60_000 < now,
-  }));
+  const rows: HostGameRowData[] = games.map((g) => {
+    const totals = paymentTotals(g);
+    return {
+      id: g.id,
+      title: g.title,
+      venueName: g.venue.name,
+      city: g.venue.city,
+      dateLabel: formatGameDate(g.date),
+      timeLabel: formatGameTime(g.date),
+      format: g.format,
+      pricePerSpot: g.pricePerSpot,
+      spotsTaken: spotsTaken(g),
+      capacity: g.capacity,
+      cancelled: g.status === "CANCELLED",
+      past: g.date.getTime() + g.durationMin * 60_000 < now,
+      amountDue: totals.due,
+      amountPaid: totals.paid,
+      amountOutstanding: totals.outstanding,
+    };
+  });
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

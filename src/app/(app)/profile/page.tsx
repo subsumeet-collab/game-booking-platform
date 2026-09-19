@@ -24,7 +24,6 @@ export default async function ProfilePage() {
           </div>
           <Row label="Role" value={user.isHost ? "Host & Player" : "Player"} />
           <Row label="City" value={user.city} />
-          <Row label="Wallet Balance" value={`₹${user.walletBalance}`} />
           <Row label="Member Since" value={user.createdAt.toLocaleDateString("en-IN")} />
         </div>
       </div>

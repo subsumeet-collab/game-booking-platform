@@ -8,39 +8,28 @@ export default async function NotificationsPage() {
   const session = await getServerSession(authOptions);
   const userId = session!.user.id;
 
-  const [bookings, txns] = await Promise.all([
-    prisma.booking.findMany({
-      where: { userId },
-      include: { game: true },
-      orderBy: { createdAt: "desc" },
-      take: 20,
-    }),
-    prisma.walletTransaction.findMany({
-      where: { userId },
-      orderBy: { createdAt: "desc" },
-      take: 20,
-    }),
-  ]);
+  const bookings = await prisma.booking.findMany({
+    where: { userId },
+    include: { game: true },
+    orderBy: { createdAt: "desc" },
+    take: 30,
+  });
 
-  const notifications: Notification[] = [
-    ...bookings.map((b) => ({
+  const notifications: Notification[] = bookings
+    .map((b) => ({
       id: `booking-${b.id}`,
       icon: b.status === "CANCELLED" ? "⛔" : b.status === "WAITLISTED" ? "📋" : "✅",
       text:
         b.status === "CANCELLED"
-          ? `Your booking for "${b.game.title}" was cancelled.`
+          ? b.forfeited
+            ? `Your booking for "${b.game.title}" was cancelled — the spot fee is still owed.`
+            : `Your booking for "${b.game.title}" was cancelled.`
           : b.status === "WAITLISTED"
             ? `You joined the waitlist for "${b.game.title}".`
             : `You're confirmed for "${b.game.title}".`,
       at: b.cancelledAt ?? b.createdAt,
-    })),
-    ...txns.map((t) => ({
-      id: `txn-${t.id}`,
-      icon: t.amount < 0 ? "💸" : "💰",
-      text: `${t.note || t.type} — ${t.amount < 0 ? "-" : "+"}₹${Math.abs(t.amount)}`,
-      at: t.createdAt,
-    })),
-  ].sort((a, b) => b.at.getTime() - a.at.getTime());
+    }))
+    .sort((a, b) => b.at.getTime() - a.at.getTime());
 
   return (
     <div className="max-w-2xl">

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export type HostGameRowData = {
   id: string;
@@ -16,6 +17,9 @@ export type HostGameRowData = {
   capacity: number;
   cancelled: boolean;
   past: boolean;
+  amountDue: number;
+  amountPaid: number;
+  amountOutstanding: number;
 };
 
 export function HostGameRow({ game }: { game: HostGameRowData }) {
@@ -24,7 +28,7 @@ export function HostGameRow({ game }: { game: HostGameRowData }) {
   const [error, setError] = useState("");
 
   async function cancelGame() {
-    if (!confirm(`Cancel "${game.title}"? All confirmed players will be refunded.`)) return;
+    if (!confirm(`Cancel "${game.title}"? Every confirmed player will be let off the fee.`)) return;
     setLoading(true);
     setError("");
     const res = await fetch(`/api/games/${game.id}/cancel`, { method: "POST" });
@@ -56,13 +60,29 @@ export function HostGameRow({ game }: { game: HostGameRowData }) {
         <p className="text-sm text-muted">
           {game.spotsTaken} of {game.capacity} spots filled
         </p>
+        {!game.cancelled && game.amountDue > 0 && (
+          <p className="text-sm mt-1">
+            <span className="text-live font-semibold">₹{game.amountPaid} paid</span>
+            {" · "}
+            <span className={game.amountOutstanding > 0 ? "text-warn font-semibold" : "text-muted"}>
+              ₹{game.amountOutstanding} outstanding
+            </span>
+          </p>
+        )}
         {error && <p className="text-sm text-danger mt-1">{error}</p>}
       </div>
-      {!game.cancelled && !game.past && (
-        <button onClick={cancelGame} disabled={loading} className="btn-secondary shrink-0 !py-2">
-          {loading ? "Cancelling…" : "Cancel Game"}
-        </button>
-      )}
+      <div className="flex items-center gap-2 shrink-0">
+        {game.amountDue > 0 && (
+          <Link href={`/host/games/${game.id}`} className="btn-secondary !py-2">
+            Manage Payments
+          </Link>
+        )}
+        {!game.cancelled && !game.past && (
+          <button onClick={cancelGame} disabled={loading} className="btn-secondary !py-2">
+            {loading ? "Cancelling…" : "Cancel Game"}
+          </button>
+        )}
+      </div>
     </div>
   );
 }

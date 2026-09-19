@@ -17,7 +17,7 @@ export async function POST(_req: Request, { params }: { params: { id: string } }
   if (existing) return NextResponse.json({ error: "You already have a spot in this game." }, { status: 400 });
 
   const booking = await prisma.booking.create({
-    data: { gameId: game.id, userId: session.user.id, status: "WAITLISTED", guestCount: 0, totalPaid: 0 },
+    data: { gameId: game.id, userId: session.user.id, status: "WAITLISTED", guestCount: 0, amountDue: 0 },
   });
 
   return NextResponse.json({ booking }, { status: 201 });

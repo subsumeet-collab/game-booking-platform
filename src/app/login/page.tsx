@@ -7,7 +7,7 @@ import { useState, Suspense } from "react";
 function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
-  const [email, setEmail] = useState("sumeet@kasakai.demo");
+  const [email, setEmail] = useState("sumeet@example.com");
   const [password, setPassword] = useState("password123");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -32,13 +32,10 @@ function LoginForm() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-bg px-4">
       <div className="w-full max-w-sm card">
-        <div className="flex items-center gap-2 mb-6">
-          <div className="bg-white text-black font-black text-xs px-2 py-1 leading-tight">
-            KASA
-            <br />
-            KAI
-          </div>
-          <span className="text-muted text-sm">Pickup sports, sorted.</span>
+        <div className="mb-6">
+          <span className="text-xl font-black tracking-tight">
+            Game<span className="text-accent">Booking</span>
+          </span>
         </div>
         <h1 className="text-2xl font-bold mb-1">Log in</h1>
         <p className="text-muted text-sm mb-6">Seeded demo accounts — see README for credentials.</p>

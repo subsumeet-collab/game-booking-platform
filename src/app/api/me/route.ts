@@ -16,7 +16,6 @@ export async function GET() {
     name: user.name,
     email: user.email,
     city: user.city,
-    walletBalance: user.walletBalance,
     isHost: user.isHost,
   });
 }

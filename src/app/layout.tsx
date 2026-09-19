@@ -3,7 +3,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: "Kasa Kai — Pickup Sports Games",
+  title: "Game Booking",
   description: "Host or join pickup sports games near you.",
 };
 

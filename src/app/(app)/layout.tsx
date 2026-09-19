@@ -14,7 +14,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex min-h-screen bg-bg">
-      <Sidebar user={{ name: user.name, walletBalance: user.walletBalance, isHost: user.isHost }} />
+      <Sidebar user={{ name: user.name, isHost: user.isHost }} />
       <div className="flex-1 min-w-0">
         <Topbar city={user.city} />
         <main className="p-6">{children}</main>
