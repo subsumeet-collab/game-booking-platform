@@ -21,7 +21,7 @@ export default async function FeedbackPage() {
             {feedback.map((f) => (
               <div key={f.id} className="card">
                 <p className="text-accent mb-1">{"★".repeat(f.rating)}{"☆".repeat(5 - f.rating)}</p>
-                {f.comment && <p className="text-sm text-gray-200">{f.comment}</p>}
+                {f.comment && <p className="text-sm text-fg/80">{f.comment}</p>}
                 <p className="text-xs text-muted mt-2">{f.createdAt.toLocaleString("en-IN")}</p>
               </div>
             ))}

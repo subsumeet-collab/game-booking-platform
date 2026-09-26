@@ -167,7 +167,7 @@ function Overlay({ children, onClose }: { children: React.ReactNode; onClose: ()
         className="card w-full max-w-lg max-h-[90vh] overflow-y-auto relative"
         onClick={(e) => e.stopPropagation()}
       >
-        <button onClick={onClose} className="absolute top-4 right-4 text-muted hover:text-white text-xl">
+        <button onClick={onClose} className="absolute top-4 right-4 text-muted hover:text-fg text-xl">
           ✕
         </button>
         {children}

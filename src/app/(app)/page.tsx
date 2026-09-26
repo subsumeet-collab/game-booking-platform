@@ -106,7 +106,7 @@ export default async function BrowseGamesPage({
         </span>
       )}
       <h1 className="text-4xl font-black mb-6">
-        Your Football <span className="text-accent">World</span>
+        Our Sporting <span className="text-accent">Club</span>
       </h1>
 
       {totalOwed > 0 && (

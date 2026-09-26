@@ -16,7 +16,7 @@ Click the button above (or see **Deploying to Render** below) to get a live URL 
 ## Core model
 
 - **Anyone can create an account** (name/email/password, from the "Create Account" tab on the login page) and immediately browse and book games as a player.
-- **Hosting is restricted to a single account** (`sumeet@example.com` in the seed data — see `HOST_EMAIL` in `prisma/seed.ts`). Signups are always players; only that one account sees "Host a Game" / "All Payments" in the sidebar.
+- **Hosting is restricted to an allow-list of accounts** (see `HOST_EMAILS` in `prisma/seed.ts`). Signups are always players; only listed accounts see "Host a Game" / "All Payments" in the sidebar.
 - The **host** creates a **Game**: venue, date/time, format (e.g. `6v6`), capacity, and *optionally* a price per spot — it's fine to leave the price blank and set it later (e.g. once you know the actual turf cost).
 - **Players** browse games (filterable by date, time, format, price, spots) and **confirm** a spot, optionally bringing up to 4 guests. There's no online payment — players settle up with the host directly (cash, UPI, etc.).
 - If a game is full, players can **join the waitlist**. When a confirmed player cancels, the longest-waiting eligible waitlisted player is automatically promoted.
@@ -41,7 +41,8 @@ Visit `http://localhost:3000`.
 
 | Email | Role | Notes |
 | --- | --- | --- |
-| `sumeet@example.com` | **Host** + player | The only account that can host games |
+| `sumeet@example.com` | **Host** + player | |
+| `sumeet.tripathy@impactguru.com` | **Host** + player | |
 | `kanha@example.com` | Player | |
 | `karan@example.com` | Player | |
 | `player1@example.com` … `player10@example.com` | Player | |
@@ -77,4 +78,4 @@ This repo includes a `render.yaml` blueprint.
 - No online payment gateway — by design, payments happen off-platform and hosts mark them settled.
 - Signup is a bare credentials flow (name/email/password, no verification email) — add email verification/OAuth if this goes beyond a private group.
 - No image uploads for venues/games yet; venue "photos" aren't modeled.
-- No self-serve way to promote another account to host — change `HOST_EMAIL` in `prisma/seed.ts` (or edit the DB directly) if that's ever needed.
+- No self-serve way to promote another account to host — add an email to `HOST_EMAILS` in `prisma/seed.ts` (or edit the DB directly) if that's ever needed.

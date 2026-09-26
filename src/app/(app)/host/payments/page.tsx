@@ -109,7 +109,7 @@ export default async function AllPaymentsPage() {
               <div className="min-w-0">
                 <p className="font-semibold truncate">{r.playerName}</p>
                 <p className="text-xs text-muted truncate">
-                  <Link href={`/host/games/${r.gameId}`} className="underline hover:text-white">
+                  <Link href={`/host/games/${r.gameId}`} className="underline hover:text-fg">
                     {r.gameTitle}
                   </Link>{" "}
                   · {r.dateLabel} · {r.timeLabel} · {r.priceSet ? `₹${r.amountDue}` : "price not set"}

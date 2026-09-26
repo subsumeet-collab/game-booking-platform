@@ -4,27 +4,27 @@
 
 @layer base {
   body {
-    @apply bg-bg text-white antialiased;
+    @apply bg-bg text-fg antialiased;
   }
 }
 
 @layer components {
   .card {
-    @apply bg-panel border border-border rounded-xl p-5;
+    @apply bg-panel border border-border rounded-xl p-5 shadow-sm;
   }
   .btn-primary {
     @apply bg-accent hover:bg-accent2 text-black font-bold uppercase text-sm tracking-wide rounded-lg px-4 py-3 transition-colors disabled:opacity-40 disabled:cursor-not-allowed;
   }
   .btn-secondary {
-    @apply bg-panel2 hover:bg-border border border-border text-white font-semibold uppercase text-sm tracking-wide rounded-lg px-4 py-3 transition-colors;
+    @apply bg-panel2 hover:bg-border border border-border text-fg font-semibold uppercase text-sm tracking-wide rounded-lg px-4 py-3 transition-colors;
   }
   .btn-waitlist {
-    @apply bg-warn/20 hover:bg-warn/30 border border-warn text-warn font-bold uppercase text-sm tracking-wide rounded-lg px-4 py-3 transition-colors;
+    @apply bg-warn/10 hover:bg-warn/20 border border-warn text-warn font-bold uppercase text-sm tracking-wide rounded-lg px-4 py-3 transition-colors;
   }
   .pill {
     @apply rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-wide;
   }
   .input {
-    @apply w-full bg-panel2 border border-border rounded-lg px-3 py-2.5 text-white placeholder:text-muted focus:outline-none focus:border-accent;
+    @apply w-full bg-panel2 border border-border rounded-lg px-3 py-2.5 text-fg placeholder:text-muted focus:outline-none focus:border-accent;
   }
 }

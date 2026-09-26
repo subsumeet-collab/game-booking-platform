@@ -5,16 +5,17 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        bg: "#0a0a0a",
-        panel: "#131313",
-        panel2: "#1a1a1a",
-        border: "#2a2a2a",
-        accent: "#c6ff1a",
-        accent2: "#9be600",
-        muted: "#8a8a8a",
-        danger: "#ff4d4f",
-        warn: "#e5a412",
-        live: "#22c55e",
+        bg: "#f4f5f1",
+        panel: "#ffffff",
+        panel2: "#eef0ea",
+        border: "#e0e2da",
+        fg: "#171a14",
+        accent: "#7cb305",
+        accent2: "#5e8a04",
+        muted: "#6b7062",
+        danger: "#dc2626",
+        warn: "#b45309",
+        live: "#16a34a",
       },
       borderRadius: {
         xl: "14px",

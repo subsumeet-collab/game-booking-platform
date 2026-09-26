@@ -41,7 +41,7 @@ export function Sidebar({
               className={`flex items-center gap-3 px-5 py-3 text-sm font-medium transition-colors ${
                 active
                   ? "bg-panel2 text-accent border-r-2 border-accent"
-                  : "text-gray-300 hover:bg-panel2 hover:text-white"
+                  : "text-muted hover:bg-panel2 hover:text-fg"
               }`}
             >
               <span>{item.icon}</span>
@@ -56,7 +56,7 @@ export function Sidebar({
               className={`flex items-center gap-3 px-5 py-3 text-sm font-medium transition-colors ${
                 pathname === "/host"
                   ? "bg-panel2 text-accent border-r-2 border-accent"
-                  : "text-gray-300 hover:bg-panel2 hover:text-white"
+                  : "text-muted hover:bg-panel2 hover:text-fg"
               }`}
             >
               <span>🏟️</span>
@@ -67,7 +67,7 @@ export function Sidebar({
               className={`flex items-center gap-3 px-5 py-3 text-sm font-medium transition-colors ${
                 pathname === "/host/payments"
                   ? "bg-panel2 text-accent border-r-2 border-accent"
-                  : "text-gray-300 hover:bg-panel2 hover:text-white"
+                  : "text-muted hover:bg-panel2 hover:text-fg"
               }`}
             >
               <span>📊</span>
@@ -86,7 +86,7 @@ export function Sidebar({
             <p className="text-sm font-semibold truncate">{user.name}</p>
             <button
               onClick={() => signOut({ callbackUrl: "/login" })}
-              className="text-xs text-muted hover:text-white"
+              className="text-xs text-muted hover:text-fg"
             >
               Log out
             </button>

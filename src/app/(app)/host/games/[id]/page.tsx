@@ -23,7 +23,7 @@ export default async function ManageGamePaymentsPage({ params }: { params: { id:
 
   return (
     <div className="max-w-3xl">
-      <Link href="/host" className="text-sm text-muted hover:text-white">
+      <Link href="/host" className="text-sm text-muted hover:text-fg">
         ← Games You Host
       </Link>
       <h1 className="text-3xl font-black mt-2 mb-1">{game.title}</h1>

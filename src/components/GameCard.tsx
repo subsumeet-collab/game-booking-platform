@@ -25,9 +25,9 @@ export type GameCardData = {
 
 const BADGE_STYLES: Record<GameBadge, string> = {
   LIVE: "bg-live/20 text-live border border-live",
-  TODAY: "bg-panel2 text-white border border-border",
-  TOMORROW: "bg-panel2 text-white border border-border",
-  UPCOMING: "bg-panel2 text-white border border-border",
+  TODAY: "bg-panel2 text-fg border border-border",
+  TOMORROW: "bg-panel2 text-fg border border-border",
+  UPCOMING: "bg-panel2 text-fg border border-border",
   FULL: "bg-danger/20 text-danger border border-danger",
   COMPLETED: "bg-panel2 text-muted border border-border",
   CANCELLED: "bg-danger/20 text-danger border border-danger",
