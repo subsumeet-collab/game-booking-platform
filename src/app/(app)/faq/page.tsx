@@ -21,7 +21,7 @@ const FAQS = [
   },
   {
     q: "What happens if I cancel?",
-    a: "Cancel at least 4 hours before kickoff and you're off the hook for the fee. Cancelling later still means you owe the host the spot fee, per the game's cancellation policy.",
+    a: "Cancel at least 24 hours before kickoff and you're off the hook for the fee. Cancelling later still means you owe the host the spot fee, per the game's cancellation policy.",
   },
   {
     q: "How do I host a game?",

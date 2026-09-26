@@ -3,7 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { tryPromoteWaitlist } from "@/lib/booking";
 
-const FEE_WAIVER_WINDOW_HOURS = 4;
+const FEE_WAIVER_WINDOW_HOURS = 24;
 const bodySchema = z.object({ playerName: z.string().trim().min(1).max(80) });
 
 export async function POST(req: Request, { params }: { params: { id: string } }) {

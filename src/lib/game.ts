@@ -1,5 +1,14 @@
 import type { Booking, Game, Venue } from "@prisma/client";
 
+// Always render in the city's own timezone (see lib/city.ts), regardless of what
+// timezone the server happens to run in (Render's containers run in UTC).
+const DISPLAY_TIME_ZONE = "Asia/Kolkata";
+
+/** "YYYY-MM-DD" for the given instant, as a calendar date in DISPLAY_TIME_ZONE. */
+function istDateKey(d: Date): string {
+  return d.toLocaleDateString("en-CA", { timeZone: DISPLAY_TIME_ZONE });
+}
+
 export type GameWithBookings = Game & { bookings: Booking[] };
 export type GameForCard = Game & { venue: Venue; bookings: Booking[] };
 
@@ -43,9 +52,12 @@ export function gameBadge(game: GameWithBookings, now: Date = new Date()): GameB
   const end = start + game.durationMin * 60_000;
   if (now.getTime() >= start && now.getTime() <= end) return "LIVE";
 
-  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const startOfGameDay = new Date(game.date.getFullYear(), game.date.getMonth(), game.date.getDate());
-  const dayDiff = Math.round((startOfGameDay.getTime() - startOfToday.getTime()) / 86_400_000);
+  // Compare calendar days in the city's own timezone, not the server's — otherwise a
+  // game just after midnight IST can look like it's still "today" (or vice versa) to
+  // a server running in UTC.
+  const todayKey = new Date(istDateKey(now) + "T00:00:00Z").getTime();
+  const gameDayKey = new Date(istDateKey(game.date) + "T00:00:00Z").getTime();
+  const dayDiff = Math.round((gameDayKey - todayKey) / 86_400_000);
 
   if (dayDiff === 0) return "TODAY";
   if (dayDiff === 1) return "TOMORROW";
@@ -97,12 +109,17 @@ export function pricePerSpotLabel(price: number | null): string {
 }
 
 export function formatGameDate(d: Date): string {
-  return d.toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
+  return d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", timeZone: DISPLAY_TIME_ZONE });
 }
 
 export function formatGameTime(d: Date): string {
   return d
-    .toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true })
+    .toLocaleTimeString("en-IN", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+      timeZone: DISPLAY_TIME_ZONE,
+    })
     .toLowerCase()
     .replace(" ", " ");
 }

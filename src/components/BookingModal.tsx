@@ -104,7 +104,7 @@ export function BookingModal({ game, onClose }: { game: GameCardData; onClose: (
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 border-y border-border py-4 mb-4 text-sm">
         <div>
           <p className="text-[10px] uppercase text-muted mb-1">Date</p>
-          <p className="font-bold">{game.dateISO.slice(0, 10)}</p>
+          <p className="font-bold">{game.dateLabel}</p>
         </div>
         <div>
           <p className="text-[10px] uppercase text-muted mb-1">Time</p>
