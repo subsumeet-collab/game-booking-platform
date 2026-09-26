@@ -98,7 +98,6 @@ export function BookingModal({ game, onClose }: { game: GameCardData; onClose: (
           onChange={(e) => setPlayerName(e.target.value)}
           placeholder="e.g. Raj Mehta"
           maxLength={80}
-          required
         />
       </div>
 
