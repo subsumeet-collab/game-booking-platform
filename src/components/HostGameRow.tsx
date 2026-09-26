@@ -16,6 +16,7 @@ export type HostGameRowData = {
   pricePerSpot: number | null;
   spotsTaken: number;
   capacity: number;
+  waitlistCount: number;
   cancelled: boolean;
   past: boolean;
   amountDue: number;
@@ -60,6 +61,9 @@ export function HostGameRow({ game }: { game: HostGameRowData }) {
         </p>
         <p className="text-sm text-muted">
           {game.spotsTaken} of {game.capacity} spots filled
+          {game.waitlistCount > 0 && (
+            <span className="text-warn font-semibold"> · {game.waitlistCount} waiting</span>
+          )}
         </p>
         {!game.cancelled && (
           <p className="text-sm mt-1">

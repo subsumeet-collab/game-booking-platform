@@ -33,6 +33,7 @@ export default async function HostPage() {
       pricePerSpot: g.pricePerSpot,
       spotsTaken: spotsTaken(g),
       capacity: g.capacity,
+      waitlistCount: g.bookings.filter((b) => b.status === "WAITLISTED").length,
       cancelled: g.status === "CANCELLED",
       past: g.date.getTime() + g.durationMin * 60_000 < now,
       amountDue: totals.due,
