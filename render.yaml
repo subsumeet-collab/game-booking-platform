@@ -7,7 +7,7 @@ services:
     startCommand: npx prisma migrate deploy && npm run seed && npm start
     envVars:
       - key: DATABASE_URL
-        value: file:./dev.db
+        sync: false # set manually in the Render dashboard to a persistent Postgres connection string (e.g. Neon) — a local file: URL has no disk to survive a restart
       - key: NEXTAUTH_SECRET
         generateValue: true
       - key: NEXTAUTH_URL

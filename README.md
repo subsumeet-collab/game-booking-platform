@@ -10,7 +10,7 @@ Click the button above (or see **Deploying to Render** below) to get a live URL 
 
 - **Next.js 14** (App Router, TypeScript)
 - **Tailwind CSS** — dark/neon theme
-- **Prisma + SQLite** (swap `DATABASE_URL` for Postgres/MySQL in production)
+- **Prisma + Postgres** (point `DATABASE_URL` at any Postgres instance — a free one from [Neon](https://neon.tech) works well; Render's free plan gives the app no persistent disk of its own, so a local SQLite file would get wiped on every idle-then-visited restart)
 - **NextAuth** (credentials login — hosts only)
 
 ## Core model
@@ -34,8 +34,9 @@ Click the button above (or see **Deploying to Render** below) to get a live URL 
 
 ```bash
 npm install
-npx prisma migrate dev --name init   # creates prisma/dev.db and applies the schema
-npm run seed                         # seeds host account(s) and venues (no games, no players)
+# Point DATABASE_URL (in .env) at a Postgres instance — a local one (e.g. `createdb gamebooking`) or a free Neon project both work.
+npx prisma migrate dev   # applies the schema
+npm run seed             # seeds host account(s) and venues (no games, no players)
 npm run dev
 ```
 
@@ -58,7 +59,7 @@ This repo includes a `render.yaml` blueprint.
 2. Render provisions a free web service and runs the build. First deploy takes a few minutes.
 3. Once live, your URL is `https://game-booking-platform.onrender.com` (or a Render-assigned variant if that name is taken — update the `NEXTAUTH_URL` env var on the service to match, then redeploy).
 
-**Persistence note:** the deployed app uses SQLite on the free plan's ephemeral disk, and the start command re-seeds automatically on every boot. That means games/bookings created live may reset after a period of inactivity (Render's free tier spins down and loses the disk) — fine for demoing the product, not for real usage. For persistent data, point `DATABASE_URL` at a real Postgres instance (Render's own Postgres, Neon, Supabase, etc.) and re-run `npx prisma migrate deploy` against it.
+**Persistence:** set the `DATABASE_URL` env var on the Render service to a real Postgres connection string (a free [Neon](https://neon.tech) project works well) *before* the first deploy — it's left unset in `render.yaml` (`sync: false`) on purpose so it's set once by hand rather than checked into the blueprint. Render's free web-service plan has no persistent disk, so without this, games/bookings would vanish every time the service spins down from inactivity and back up.
 
 ## Project layout
 

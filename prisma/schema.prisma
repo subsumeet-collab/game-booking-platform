@@ -3,11 +3,12 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-// SQLite has no native enum support, so these are plain strings.
+// The schema predates Postgres (it ran on SQLite, which has no native enum
+// support) and status fields were never converted — they're still plain strings.
 // GameStatus: UPCOMING | CANCELLED | COMPLETED (LIVE/FULL are derived at read time, see src/lib/game.ts)
 // BookingStatus: CONFIRMED | WAITLISTED | CANCELLED | COMPLETED
 
