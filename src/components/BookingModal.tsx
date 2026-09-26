@@ -69,7 +69,7 @@ export function BookingModal({ game, onClose }: { game: GameCardData; onClose: (
         <span className="text-muted text-lg font-medium">{game.city}</span>
       </h2>
 
-      <div className="grid grid-cols-4 gap-2 border-y border-border py-4 mb-4 text-sm">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 border-y border-border py-4 mb-4 text-sm">
         <div>
           <p className="text-[10px] uppercase text-muted mb-1">Date</p>
           <p className="font-bold">{game.dateISO.slice(0, 10)}</p>
@@ -108,7 +108,7 @@ export function BookingModal({ game, onClose }: { game: GameCardData; onClose: (
             />
           )}
 
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
             <div>
               <p className="text-xs uppercase text-muted">Bring Friends</p>
               <p className="text-sm text-muted">

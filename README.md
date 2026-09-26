@@ -25,6 +25,8 @@ Click the button above (or see **Deploying to Render** below) to get a live URL 
 - **Hosts set/update the price and mark who's paid**: from "Games You Host" → "Manage Payments" on any game, the host can set or change the price per spot at any time (recalculating what everyone who hasn't paid yet owes), sees every payable player (confirmed, plus late cancellations that still owe), toggles them paid/unpaid, and sees a live running total of amount due / paid / outstanding for that game.
 - **"All Payments"** (host-only) is a single table of every payable booking across every hosted game, plus a per-player total-owed summary — the at-a-glance ledger.
 - **Every player** sees a "you owe ₹X" banner right on the Browse Games dashboard when they have anything outstanding, and can see the full breakdown on the **Outstanding Payments** page.
+- **Every game has a shareable link** (`/games/[id]`): a plain, deep-linkable page with the game's details and a Book/Join Waitlist button. Hit **Share** (on a game card or the detail page) to send just that one game — it uses the native share sheet on mobile (`navigator.share`) and falls back to copying the link on desktop. Opening the link while logged out redirects to login and lands back on that same game afterward.
+- **The whole app is mobile-responsive**: the sidebar becomes a slide-out drawer (hamburger toggle in the top bar) below the `md` breakpoint, and forms/modals collapse to a single column on small screens.
 
 ## Getting started
 
@@ -66,6 +68,8 @@ This repo includes a `render.yaml` blueprint.
 - `src/app/(app)/*` — authenticated pages (Browse Games, My Bookings, Cancelled Events, Completed Games, Outstanding Payments, Host, Feedback, FAQ, Notifications, Profile)
 - `src/app/(app)/host/games/[id]` — per-game payment management for the host (set/update price, mark paid)
 - `src/app/(app)/host/payments` — host-only ledger of every payable booking across every game
+- `src/app/(app)/games/[id]` — the shareable single-game detail page
+- `src/components/AppShell.tsx` — mobile drawer state + layout, wraps Sidebar/Topbar
 - `src/app/api/auth/signup` — player account creation
 - `src/app/api/*` — booking, waitlist, cancellation, payment-marking, pricing, game creation, feedback endpoints
 - `src/lib/game.ts` — spots/badge/payment-total computation shared by list and detail views

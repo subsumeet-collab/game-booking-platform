@@ -70,7 +70,7 @@ export function CreateGameForm({ defaultCity }: { defaultCity: string }) {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-xs uppercase text-muted mb-1">Venue</label>
           <input
@@ -92,7 +92,7 @@ export function CreateGameForm({ defaultCity }: { defaultCity: string }) {
         <input className="input" value={address} onChange={(e) => setAddress(e.target.value)} />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-xs uppercase text-muted mb-1">Date &amp; Time</label>
           <input
@@ -115,7 +115,7 @@ export function CreateGameForm({ defaultCity }: { defaultCity: string }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>
           <label className="block text-xs uppercase text-muted mb-1">Duration (min)</label>
           <input

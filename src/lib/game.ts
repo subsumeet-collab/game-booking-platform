@@ -1,6 +1,7 @@
-import type { Booking, Game } from "@prisma/client";
+import type { Booking, Game, User, Venue } from "@prisma/client";
 
 export type GameWithBookings = Game & { bookings: Booking[] };
+export type GameForCard = Game & { venue: Venue; bookings: (Booking & { user: Pick<User, "name"> })[] };
 
 export function spotsTaken(game: GameWithBookings): number {
   return game.bookings
@@ -49,6 +50,46 @@ export function gameBadge(game: GameWithBookings, now: Date = new Date()): GameB
   if (dayDiff === 0) return "TODAY";
   if (dayDiff === 1) return "TOMORROW";
   return "UPCOMING";
+}
+
+export type GameCardData = {
+  id: string;
+  title: string;
+  venueName: string;
+  city: string;
+  dateISO: string;
+  dateLabel: string;
+  timeLabel: string;
+  format: string;
+  pricePerSpot: number | null;
+  capacity: number;
+  spotsTaken: number;
+  spotsLeft: number;
+  badge: GameBadge;
+  participants: string[];
+  cancellationPolicy: string;
+};
+
+/** Shared shape used by the game card, the booking modal, and the shareable game-detail page. */
+export function buildGameCardData(g: GameForCard, now: Date = new Date()): GameCardData {
+  const participants = g.bookings.filter((b) => b.status === "CONFIRMED").map((b) => b.user.name);
+  return {
+    id: g.id,
+    title: g.title,
+    venueName: g.venue.name,
+    city: g.venue.city,
+    dateISO: g.date.toISOString(),
+    dateLabel: formatGameDate(g.date),
+    timeLabel: formatGameTime(g.date),
+    format: g.format,
+    pricePerSpot: g.pricePerSpot,
+    capacity: g.capacity,
+    spotsTaken: spotsTaken(g),
+    spotsLeft: spotsLeft(g),
+    badge: gameBadge(g, now),
+    participants,
+    cancellationPolicy: g.cancellationPolicy,
+  };
 }
 
 export function pricePerSpotLabel(price: number | null): string {

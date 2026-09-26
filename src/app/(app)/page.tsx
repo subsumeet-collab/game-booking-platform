@@ -2,8 +2,8 @@ import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { formatGameDate, formatGameTime, gameBadge, spotsLeft, spotsTaken } from "@/lib/game";
-import { GameCard, type GameCardData } from "@/components/GameCard";
+import { buildGameCardData, type GameCardData } from "@/lib/game";
+import { GameCard } from "@/components/GameCard";
 import { Filters } from "@/components/Filters";
 
 export default async function BrowseGamesPage({
@@ -33,29 +33,7 @@ export default async function BrowseGamesPage({
   });
 
   const now = new Date();
-  let cards: GameCardData[] = games.map((g) => {
-    const badge = gameBadge(g, now);
-    const participants = g.bookings
-      .filter((b) => b.status === "CONFIRMED")
-      .map((b) => b.user.name);
-    return {
-      id: g.id,
-      title: g.title,
-      venueName: g.venue.name,
-      city: g.venue.city,
-      dateISO: g.date.toISOString(),
-      dateLabel: formatGameDate(g.date),
-      timeLabel: formatGameTime(g.date),
-      format: g.format,
-      pricePerSpot: g.pricePerSpot,
-      capacity: g.capacity,
-      spotsTaken: spotsTaken(g),
-      spotsLeft: spotsLeft(g),
-      badge,
-      participants,
-      cancellationPolicy: g.cancellationPolicy,
-    };
-  });
+  let cards: GameCardData[] = games.map((g) => buildGameCardData(g, now));
 
   // Hide completed games from the browse list; they live under "Completed Games".
   cards = cards.filter((c) => c.badge !== "COMPLETED");

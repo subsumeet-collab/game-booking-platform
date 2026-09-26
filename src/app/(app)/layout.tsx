@@ -2,8 +2,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Sidebar } from "@/components/Sidebar";
-import { Topbar } from "@/components/Topbar";
+import { AppShell } from "@/components/AppShell";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
@@ -13,12 +12,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!user) redirect("/login");
 
   return (
-    <div className="flex min-h-screen bg-bg">
-      <Sidebar user={{ name: user.name, isHost: user.isHost }} />
-      <div className="flex-1 min-w-0">
-        <Topbar city={user.city} />
-        <main className="p-6">{children}</main>
-      </div>
-    </div>
+    <AppShell user={{ name: user.name, isHost: user.isHost }} city={user.city}>
+      {children}
+    </AppShell>
   );
 }

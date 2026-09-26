@@ -1,27 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import type { GameBadge } from "@/lib/game";
+import Link from "next/link";
+import type { GameBadge, GameCardData } from "@/lib/game";
 import { pricePerSpotLabel } from "@/lib/game";
 import { BookingModal } from "@/components/BookingModal";
+import { ShareGameButton } from "@/components/ShareGameButton";
 
-export type GameCardData = {
-  id: string;
-  title: string;
-  venueName: string;
-  city: string;
-  dateISO: string;
-  dateLabel: string;
-  timeLabel: string;
-  format: string;
-  pricePerSpot: number | null;
-  capacity: number;
-  spotsTaken: number;
-  spotsLeft: number;
-  badge: GameBadge;
-  participants: string[];
-  cancellationPolicy: string;
-};
+export type { GameCardData };
 
 const BADGE_STYLES: Record<GameBadge, string> = {
   LIVE: "bg-live/20 text-live border border-live",
@@ -59,14 +45,17 @@ export function GameCard({ game }: { game: GameCardData }) {
   return (
     <>
       <div className={`card border ${CARD_BORDER[game.badge]} flex flex-col`}>
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-3 gap-2">
           <span className={`pill flex items-center gap-1.5 ${BADGE_STYLES[game.badge]}`}>
             {game.badge === "LIVE" && <span className="w-1.5 h-1.5 rounded-full bg-live inline-block" />}
             {game.badge}
           </span>
-          <span className={`text-xl font-black ${game.pricePerSpot === null ? "text-muted text-sm uppercase" : ""}`}>
-            {pricePerSpotLabel(game.pricePerSpot)}
-          </span>
+          <div className="flex items-center gap-2 shrink-0">
+            <ShareGameButton gameId={game.id} title={game.title} iconOnly />
+            <span className={`text-xl font-black ${game.pricePerSpot === null ? "text-muted text-sm uppercase" : ""}`}>
+              {pricePerSpotLabel(game.pricePerSpot)}
+            </span>
+          </div>
         </div>
 
         <h3 className="text-lg font-bold mb-1 truncate" title={game.title}>
@@ -114,9 +103,9 @@ export function GameCard({ game }: { game: GameCardData }) {
               {isFull ? "📋 Join Waitlist" : "⚽ Book"}
             </button>
           )}
-          <button onClick={() => setOpen(true)} className="btn-secondary flex-1">
+          <Link href={`/games/${game.id}`} className="btn-secondary flex-1 text-center">
             View More Details →
-          </button>
+          </Link>
         </div>
       </div>
 
