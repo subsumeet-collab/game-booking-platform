@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { GameCardData } from "@/components/GameCard";
 
 const MAX_GUESTS = 4;
+const NAME_STORAGE_KEY = "gamebooking:playerName";
 
 export function BookingModal({ game, onClose }: { game: GameCardData; onClose: () => void }) {
   const router = useRouter();
+  const [playerName, setPlayerName] = useState("");
   const [guestCount, setGuestCount] = useState(0);
   const [note, setNote] = useState("");
   const [prefsOpen, setPrefsOpen] = useState(false);
@@ -20,20 +22,39 @@ export function BookingModal({ game, onClose }: { game: GameCardData; onClose: (
   const priceKnown = game.pricePerSpot !== null;
   const amountDue = priceKnown ? game.pricePerSpot! * (1 + guestCount) : null;
 
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(NAME_STORAGE_KEY);
+      if (saved) setPlayerName(saved);
+    } catch {
+      // localStorage can throw in private-browsing contexts — fine to skip.
+    }
+  }, []);
+
   async function handleConfirm() {
+    const trimmedName = playerName.trim();
+    if (trimmedName.length < 2) {
+      setError("Enter your name (at least 2 characters).");
+      return;
+    }
     setSubmitting(true);
     setError("");
     const endpoint = isFull ? `/api/games/${game.id}/waitlist` : `/api/games/${game.id}/book`;
     const res = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ guestCount, note }),
+      body: JSON.stringify({ playerName: trimmedName, guestCount, note }),
     });
     const data = await res.json();
     setSubmitting(false);
     if (!res.ok) {
       setError(data.error || "Something went wrong.");
       return;
+    }
+    try {
+      localStorage.setItem(NAME_STORAGE_KEY, trimmedName);
+    } catch {
+      // Non-fatal — just means the name won't be pre-filled next time.
     }
     setDone(isFull ? "waitlisted" : "booked");
     router.refresh();
@@ -49,7 +70,7 @@ export function BookingModal({ game, onClose }: { game: GameCardData; onClose: (
           </h2>
           <p className="text-muted text-sm mb-6">
             {done === "booked"
-              ? `Spot confirmed for ${game.title}. Check My Bookings for details.`
+              ? `Spot confirmed for ${game.title}. Find it under My Games with your name.`
               : `We'll notify you if a spot opens up for ${game.title}.`}
           </p>
           <button className="btn-primary w-full" onClick={onClose}>
@@ -68,6 +89,18 @@ export function BookingModal({ game, onClose }: { game: GameCardData; onClose: (
         <br />
         <span className="text-muted text-lg font-medium">{game.city}</span>
       </h2>
+
+      <div className="mb-4">
+        <label className="block text-xs uppercase text-muted mb-1">Your Name</label>
+        <input
+          className="input"
+          value={playerName}
+          onChange={(e) => setPlayerName(e.target.value)}
+          placeholder="e.g. Raj Mehta"
+          maxLength={80}
+          required
+        />
+      </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 border-y border-border py-4 mb-4 text-sm">
         <div>
@@ -153,7 +186,7 @@ export function BookingModal({ game, onClose }: { game: GameCardData; onClose: (
 
       {error && <p className="text-sm text-danger mb-3">{error}</p>}
 
-      <button className="btn-primary w-full" disabled={submitting} onClick={handleConfirm}>
+      <button className="btn-primary w-full" disabled={submitting || playerName.trim().length < 2} onClick={handleConfirm}>
         {submitting ? "Processing…" : isFull ? "Join Waitlist" : "Confirm Spot"}
       </button>
     </Overlay>

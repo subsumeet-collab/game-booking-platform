@@ -1,8 +1,7 @@
-import { getServerSession } from "next-auth";
 import Link from "next/link";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { buildGameCardData, type GameCardData } from "@/lib/game";
+import { DEFAULT_CITY } from "@/lib/city";
 import { GameCard } from "@/components/GameCard";
 import { Filters } from "@/components/Filters";
 
@@ -11,31 +10,18 @@ export default async function BrowseGamesPage({
 }: {
   searchParams: Record<string, string | undefined>;
 }) {
-  const session = await getServerSession(authOptions);
-  const user = await prisma.user.findUnique({ where: { id: session!.user.id } });
-  const city = user?.city ?? "Mumbai";
-
-  const owedAgg = await prisma.booking.aggregate({
-    where: {
-      userId: session!.user.id,
-      paid: false,
-      amountDue: { gt: 0 },
-      OR: [{ status: "CONFIRMED" }, { forfeited: true }],
-    },
-    _sum: { amountDue: true },
-  });
-  const totalOwed = owedAgg._sum.amountDue ?? 0;
+  const city = DEFAULT_CITY;
 
   const games = await prisma.game.findMany({
     where: { venue: { city }, status: { not: "CANCELLED" } },
-    include: { venue: true, bookings: { include: { user: true } } },
+    include: { venue: true, bookings: true },
     orderBy: { date: "asc" },
   });
 
   const now = new Date();
   let cards: GameCardData[] = games.map((g) => buildGameCardData(g, now));
 
-  // Hide completed games from the browse list; they live under "Completed Games".
+  // Hide completed games from the browse list — they're only useful to look up via My Games.
   cards = cards.filter((c) => c.badge !== "COMPLETED");
 
   const { date, time, format, price, spots, sort } = searchParams;
@@ -87,17 +73,13 @@ export default async function BrowseGamesPage({
         Our Sporting <span className="text-accent">Club</span>
       </h1>
 
-      {totalOwed > 0 && (
-        <Link
-          href="/payments"
-          className="card !py-3 mb-6 flex items-center justify-between border-warn/60 hover:bg-panel2 transition-colors block"
-        >
-          <span className="text-sm">
-            You owe <span className="text-warn font-bold">₹{totalOwed}</span> across your games.
-          </span>
-          <span className="text-sm text-muted">View Outstanding Payments →</span>
-        </Link>
-      )}
+      <Link
+        href="/my-games"
+        className="card !py-3 mb-6 flex items-center justify-between hover:bg-panel2 transition-colors block"
+      >
+        <span className="text-sm">Already booked a spot? Look up what you owe and manage it.</span>
+        <span className="text-sm text-muted">My Games →</span>
+      </Link>
 
       <Filters />
 

@@ -8,12 +8,13 @@ import { PaidToggleButton } from "@/components/PaidToggleButton";
 
 export default async function AllPaymentsPage() {
   const session = await getServerSession(authOptions);
-  const me = await prisma.user.findUnique({ where: { id: session!.user.id } });
+  if (!session?.user) redirect("/login");
+  const me = await prisma.user.findUnique({ where: { id: session.user.id } });
   if (!me?.isHost) redirect("/");
 
   const games = await prisma.game.findMany({
     where: { hostId: me.id, status: { not: "CANCELLED" } },
-    include: { venue: true, bookings: { include: { user: true } } },
+    include: { venue: true, bookings: true },
     orderBy: { date: "desc" },
   });
 
@@ -32,7 +33,7 @@ export default async function AllPaymentsPage() {
   const rows: Row[] = games.flatMap((g) =>
     payableBookings(g).map((b) => ({
       bookingId: b.id,
-      playerName: b.user.name,
+      playerName: b.playerName,
       gameId: g.id,
       gameTitle: g.title,
       dateLabel: formatGameDate(g.date),

@@ -1,18 +1,20 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { tryPromoteWaitlist } from "@/lib/booking";
 
 const FEE_WAIVER_WINDOW_HOURS = 4;
+const bodySchema = z.object({ playerName: z.string().trim().min(1).max(80) });
 
-export async function POST(_req: Request, { params }: { params: { id: string } }) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+export async function POST(req: Request, { params }: { params: { id: string } }) {
+  const parsed = bodySchema.safeParse(await req.json().catch(() => ({})));
+  if (!parsed.success) return NextResponse.json({ error: "Enter your name to cancel." }, { status: 400 });
 
   const booking = await prisma.booking.findUnique({ where: { id: params.id }, include: { game: true } });
   if (!booking) return NextResponse.json({ error: "Booking not found" }, { status: 404 });
-  if (booking.userId !== session.user.id) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (booking.playerName.toLowerCase() !== parsed.data.playerName.toLowerCase()) {
+    return NextResponse.json({ error: "That name doesn't match this booking." }, { status: 403 });
+  }
   if (booking.status === "CANCELLED" || booking.status === "COMPLETED") {
     return NextResponse.json({ error: "This booking can't be cancelled." }, { status: 400 });
   }

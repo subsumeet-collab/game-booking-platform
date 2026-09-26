@@ -3,12 +3,14 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { formatGameDate, formatGameTime, spotsTaken, paymentTotals } from "@/lib/game";
+import { DEFAULT_CITY } from "@/lib/city";
 import { CreateGameForm } from "@/components/CreateGameForm";
 import { HostGameRow, type HostGameRowData } from "@/components/HostGameRow";
 
 export default async function HostPage() {
   const session = await getServerSession(authOptions);
-  const me = await prisma.user.findUnique({ where: { id: session!.user.id } });
+  if (!session?.user) redirect("/login");
+  const me = await prisma.user.findUnique({ where: { id: session.user.id } });
   if (!me?.isHost) redirect("/");
 
   const games = await prisma.game.findMany({
@@ -56,7 +58,7 @@ export default async function HostPage() {
         )}
       </div>
       <div>
-        <CreateGameForm defaultCity={me.city} />
+        <CreateGameForm defaultCity={DEFAULT_CITY} />
       </div>
     </div>
   );

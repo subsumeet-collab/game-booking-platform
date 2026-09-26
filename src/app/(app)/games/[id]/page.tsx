@@ -17,7 +17,7 @@ const BADGE_STYLES: Record<string, string> = {
 export default async function GameDetailPage({ params }: { params: { id: string } }) {
   const game = await prisma.game.findUnique({
     where: { id: params.id },
-    include: { venue: true, bookings: { include: { user: true } } },
+    include: { venue: true, bookings: true },
   });
   if (!game) notFound();
 

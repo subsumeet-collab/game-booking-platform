@@ -11,18 +11,16 @@ datasource db {
 // GameStatus: UPCOMING | CANCELLED | COMPLETED (LIVE/FULL are derived at read time, see src/lib/game.ts)
 // BookingStatus: CONFIRMED | WAITLISTED | CANCELLED | COMPLETED
 
+// Only hosts have accounts — players never log in, they just type their name when booking.
 model User {
   id           String   @id @default(cuid())
   name         String
   email        String   @unique
   passwordHash String
-  city         String   @default("Mumbai")
   isHost       Boolean  @default(false)
   createdAt    DateTime @default(now())
 
-  hostedGames Game[]     @relation("HostedGames")
-  bookings    Booking[]
-  feedback    Feedback[]
+  hostedGames Game[] @relation("HostedGames")
 
   @@map("users")
 }
@@ -63,33 +61,29 @@ model Game {
 }
 
 model Booking {
-  id          String   @id @default(cuid())
-  status      String   @default("CONFIRMED")
-  guestCount  Int      @default(0)
-  amountDue   Int      @default(0)
-  paid        Boolean  @default(false)
-  forfeited   Boolean  @default(false) // cancelled too late — fee is still owed
-  note        String   @default("")
-  createdAt   DateTime @default(now())
+  id          String    @id @default(cuid())
+  playerName  String
+  status      String    @default("CONFIRMED")
+  guestCount  Int       @default(0)
+  amountDue   Int       @default(0)
+  paid        Boolean   @default(false)
+  forfeited   Boolean   @default(false) // cancelled too late — fee is still owed
+  note        String    @default("")
+  createdAt   DateTime  @default(now())
   cancelledAt DateTime?
 
   game   Game   @relation(fields: [gameId], references: [id])
   gameId String
-
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
 
   @@map("bookings")
 }
 
 model Feedback {
   id        String   @id @default(cuid())
+  name      String   @default("")
   rating    Int
   comment   String   @default("")
   createdAt DateTime @default(now())
-
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
 
   @@map("feedback")
 }

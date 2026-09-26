@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 export type BookingRowData = {
   id: string;
@@ -26,8 +25,15 @@ const STATUS_STYLES: Record<string, string> = {
   COMPLETED: "bg-panel2 text-muted border-border",
 };
 
-export function BookingRow({ booking }: { booking: BookingRowData }) {
-  const router = useRouter();
+export function BookingRow({
+  booking,
+  playerName,
+  onCancelled,
+}: {
+  booking: BookingRowData;
+  playerName: string;
+  onCancelled: () => void;
+}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -35,14 +41,18 @@ export function BookingRow({ booking }: { booking: BookingRowData }) {
     if (!confirm(`Cancel your spot in "${booking.gameTitle}"?`)) return;
     setLoading(true);
     setError("");
-    const res = await fetch(`/api/bookings/${booking.id}/cancel`, { method: "POST" });
+    const res = await fetch(`/api/bookings/${booking.id}/cancel`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ playerName }),
+    });
     const data = await res.json();
     setLoading(false);
     if (!res.ok) {
       setError(data.error || "Could not cancel.");
       return;
     }
-    router.refresh();
+    onCancelled();
   }
 
   const owesMoney = booking.amountDue > 0 && !booking.paid && (booking.status === "CONFIRMED" || booking.forfeited);

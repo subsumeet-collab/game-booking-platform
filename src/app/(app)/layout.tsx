@@ -1,18 +1,15 @@
 import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AppShell } from "@/components/AppShell";
+import { DEFAULT_CITY } from "@/lib/city";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
-  if (!session?.user) redirect("/login");
-
-  const user = await prisma.user.findUnique({ where: { id: session.user.id } });
-  if (!user) redirect("/login");
+  const user = session?.user ? await prisma.user.findUnique({ where: { id: session.user.id } }) : null;
 
   return (
-    <AppShell user={{ name: user.name, isHost: user.isHost }} city={user.city}>
+    <AppShell user={user ? { name: user.name, isHost: user.isHost } : null} city={DEFAULT_CITY}>
       {children}
     </AppShell>
   );

@@ -4,16 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 
-const NAV = [
+const PUBLIC_NAV = [
   { href: "/", label: "Browse Games", icon: "🌐" },
-  { href: "/bookings", label: "My Bookings", icon: "📋" },
-  { href: "/bookings/cancelled", label: "Cancelled Events", icon: "⛔" },
-  { href: "/bookings/completed", label: "Completed Games", icon: "✅" },
-  { href: "/feedback", label: "My Feedback", icon: "⭐" },
-  { href: "/payments", label: "Outstanding Payments", icon: "💳" },
+  { href: "/my-games", label: "My Games", icon: "📋" },
+  { href: "/feedback", label: "Feedback", icon: "⭐" },
   { href: "/faq", label: "FAQ", icon: "❓" },
-  { href: "/notifications", label: "Notifications", icon: "🔔" },
-  { href: "/profile", label: "Profile", icon: "👤" },
 ];
 
 export function Sidebar({
@@ -21,7 +16,7 @@ export function Sidebar({
   mobileOpen,
   onClose,
 }: {
-  user: { name: string; isHost: boolean };
+  user: { name: string; isHost: boolean } | null;
   mobileOpen: boolean;
   onClose: () => void;
 }) {
@@ -47,7 +42,7 @@ export function Sidebar({
         </div>
 
         <nav className="flex-1 py-3 overflow-y-auto">
-          {NAV.map((item) => {
+          {PUBLIC_NAV.map((item) => {
             const active = pathname === item.href;
             return (
               <Link
@@ -65,8 +60,9 @@ export function Sidebar({
               </Link>
             );
           })}
-          {user.isHost && (
+          {user?.isHost && (
             <>
+              <div className="px-5 pt-4 pb-1 text-[10px] uppercase tracking-wide text-muted">Host</div>
               <Link
                 href="/host"
                 onClick={onClose}
@@ -95,21 +91,27 @@ export function Sidebar({
           )}
         </nav>
 
-        <div className="p-4 border-t border-border space-y-3">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-accent text-black font-bold flex items-center justify-center text-sm shrink-0">
-              {user.name.slice(0, 2).toUpperCase()}
+        <div className="p-4 border-t border-border">
+          {user ? (
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-accent text-black font-bold flex items-center justify-center text-sm shrink-0">
+                {user.name.slice(0, 2).toUpperCase()}
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold truncate">{user.name}</p>
+                <button
+                  onClick={() => signOut({ callbackUrl: "/login" })}
+                  className="text-xs text-muted hover:text-fg"
+                >
+                  Log out
+                </button>
+              </div>
             </div>
-            <div className="min-w-0">
-              <p className="text-sm font-semibold truncate">{user.name}</p>
-              <button
-                onClick={() => signOut({ callbackUrl: "/login" })}
-                className="text-xs text-muted hover:text-fg"
-              >
-                Log out
-              </button>
-            </div>
-          </div>
+          ) : (
+            <Link href="/login" onClick={onClose} className="text-xs text-muted hover:text-fg">
+              Host login →
+            </Link>
+          )}
         </div>
       </aside>
     </>

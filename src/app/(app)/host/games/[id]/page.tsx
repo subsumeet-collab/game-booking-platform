@@ -9,17 +9,18 @@ import { SetPriceForm } from "@/components/SetPriceForm";
 
 export default async function ManageGamePaymentsPage({ params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
-  const me = await prisma.user.findUnique({ where: { id: session!.user.id } });
+  if (!session?.user) redirect("/login");
+  const me = await prisma.user.findUnique({ where: { id: session.user.id } });
   if (!me?.isHost) redirect("/");
 
   const game = await prisma.game.findUnique({
     where: { id: params.id },
-    include: { venue: true, bookings: { include: { user: true } } },
+    include: { venue: true, bookings: true },
   });
   if (!game || game.hostId !== me.id) notFound();
 
   const totals = paymentTotals(game);
-  const rows = payableBookings(game).sort((a, b) => a.user.name.localeCompare(b.user.name));
+  const rows = payableBookings(game).sort((a, b) => a.playerName.localeCompare(b.playerName));
 
   return (
     <div className="max-w-3xl">
@@ -58,7 +59,7 @@ export default async function ManageGamePaymentsPage({ params }: { params: { id:
             <div key={b.id} className="card flex items-center justify-between !py-3">
               <div className="min-w-0">
                 <p className="font-semibold truncate">
-                  {b.user.name}
+                  {b.playerName}
                   {b.guestCount > 0 && ` + ${b.guestCount} guest${b.guestCount > 1 ? "s" : ""}`}
                 </p>
                 <p className="text-xs text-muted">

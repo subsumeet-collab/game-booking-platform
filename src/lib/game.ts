@@ -1,7 +1,7 @@
-import type { Booking, Game, User, Venue } from "@prisma/client";
+import type { Booking, Game, Venue } from "@prisma/client";
 
 export type GameWithBookings = Game & { bookings: Booking[] };
-export type GameForCard = Game & { venue: Venue; bookings: (Booking & { user: Pick<User, "name"> })[] };
+export type GameForCard = Game & { venue: Venue; bookings: Booking[] };
 
 export function spotsTaken(game: GameWithBookings): number {
   return game.bookings
@@ -72,7 +72,7 @@ export type GameCardData = {
 
 /** Shared shape used by the game card, the booking modal, and the shareable game-detail page. */
 export function buildGameCardData(g: GameForCard, now: Date = new Date()): GameCardData {
-  const participants = g.bookings.filter((b) => b.status === "CONFIRMED").map((b) => b.user.name);
+  const participants = g.bookings.filter((b) => b.status === "CONFIRMED").map((b) => b.playerName);
   return {
     id: g.id,
     title: g.title,

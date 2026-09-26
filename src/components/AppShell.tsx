@@ -10,7 +10,7 @@ export function AppShell({
   city,
   children,
 }: {
-  user: { name: string; isHost: boolean };
+  user: { name: string; isHost: boolean } | null;
   city: string;
   children: ReactNode;
 }) {

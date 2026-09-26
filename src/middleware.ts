@@ -1,7 +1,7 @@
 export { default } from "next-auth/middleware";
 
 export const config = {
-  matcher: [
-    "/((?!login|api/auth|_next/static|_next/image|favicon.ico).*)",
-  ],
+  // Only the host area requires a login — browsing, game details, booking, my-games,
+  // and feedback are all public.
+  matcher: ["/host/:path*"],
 };
