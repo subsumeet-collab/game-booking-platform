@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { pricePerSpotLabel } from "@/lib/game";
 
 export type HostGameRowData = {
   id: string;
@@ -12,7 +13,7 @@ export type HostGameRowData = {
   dateLabel: string;
   timeLabel: string;
   format: string;
-  pricePerSpot: number;
+  pricePerSpot: number | null;
   spotsTaken: number;
   capacity: number;
   cancelled: boolean;
@@ -55,24 +56,30 @@ export function HostGameRow({ game }: { game: HostGameRowData }) {
           🏟️ {game.venueName} · 📍 {game.city}
         </p>
         <p className="text-sm text-muted">
-          {game.dateLabel} · {game.timeLabel} · {game.format} · ₹{game.pricePerSpot}/spot
+          {game.dateLabel} · {game.timeLabel} · {game.format} · {pricePerSpotLabel(game.pricePerSpot)}/spot
         </p>
         <p className="text-sm text-muted">
           {game.spotsTaken} of {game.capacity} spots filled
         </p>
-        {!game.cancelled && game.amountDue > 0 && (
+        {!game.cancelled && (
           <p className="text-sm mt-1">
-            <span className="text-live font-semibold">₹{game.amountPaid} paid</span>
-            {" · "}
-            <span className={game.amountOutstanding > 0 ? "text-warn font-semibold" : "text-muted"}>
-              ₹{game.amountOutstanding} outstanding
-            </span>
+            {game.amountDue > 0 ? (
+              <>
+                <span className="text-live font-semibold">₹{game.amountPaid} paid</span>
+                {" · "}
+                <span className={game.amountOutstanding > 0 ? "text-warn font-semibold" : "text-muted"}>
+                  ₹{game.amountOutstanding} outstanding
+                </span>
+              </>
+            ) : game.pricePerSpot === null && game.spotsTaken > 0 ? (
+              <span className="text-warn font-semibold">Price not set yet</span>
+            ) : null}
           </p>
         )}
         {error && <p className="text-sm text-danger mt-1">{error}</p>}
       </div>
       <div className="flex items-center gap-2 shrink-0">
-        {game.amountDue > 0 && (
+        {!game.cancelled && (
           <Link href={`/host/games/${game.id}`} className="btn-secondary !py-2">
             Manage Payments
           </Link>

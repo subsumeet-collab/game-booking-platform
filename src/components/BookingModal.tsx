@@ -17,7 +17,8 @@ export function BookingModal({ game, onClose }: { game: GameCardData; onClose: (
 
   const isFull = game.badge === "FULL";
   const maxAddableGuests = Math.max(0, Math.min(MAX_GUESTS, game.spotsLeft - 1));
-  const amountDue = game.pricePerSpot * (1 + guestCount);
+  const priceKnown = game.pricePerSpot !== null;
+  const amountDue = priceKnown ? game.pricePerSpot! * (1 + guestCount) : null;
 
   async function handleConfirm() {
     setSubmitting(true);
@@ -111,7 +112,8 @@ export function BookingModal({ game, onClose }: { game: GameCardData; onClose: (
             <div>
               <p className="text-xs uppercase text-muted">Bring Friends</p>
               <p className="text-sm text-muted">
-                Add up to {MAX_GUESTS} confirmed guests — each adds ₹{game.pricePerSpot}
+                Add up to {MAX_GUESTS} confirmed guests
+                {priceKnown ? ` — each adds ₹${game.pricePerSpot}` : ""}
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -137,9 +139,11 @@ export function BookingModal({ game, onClose }: { game: GameCardData; onClose: (
 
           <div className="bg-panel2 border border-border rounded-lg p-4 mb-4">
             <p className="text-[10px] uppercase text-muted">Amount Due</p>
-            <p className="text-2xl font-black text-accent">₹{amountDue}</p>
+            <p className="text-2xl font-black text-accent">{priceKnown ? `₹${amountDue}` : "TBD"}</p>
             <p className="text-xs text-muted mt-1">
-              Pay the host directly — they'll mark you as paid once settled.
+              {priceKnown
+                ? "Pay the host directly — they'll mark you as paid once settled."
+                : "The host will set the price after the game and you'll owe it then."}
             </p>
           </div>
 

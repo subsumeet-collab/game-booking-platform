@@ -12,7 +12,7 @@ const bodySchema = z.object({
   format: z.string().min(2).max(10),
   date: z.string(), // ISO datetime-local value
   durationMin: z.number().int().min(30).max(240).default(60),
-  pricePerSpot: z.number().int().min(0).max(10_000),
+  pricePerSpot: z.number().int().min(0).max(10_000).nullable().default(null),
   capacity: z.number().int().min(2).max(30),
 });
 

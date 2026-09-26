@@ -15,13 +15,16 @@ Click the button above (or see **Deploying to Render** below) to get a live URL 
 
 ## Core model
 
-- A **host** creates a **Game**: venue, date/time, format (e.g. `6v6`), price per spot, capacity.
+- **Anyone can create an account** (name/email/password, from the "Create Account" tab on the login page) and immediately browse and book games as a player.
+- **Hosting is restricted to a single account** (`sumeet@example.com` in the seed data — see `HOST_EMAIL` in `prisma/seed.ts`). Signups are always players; only that one account sees "Host a Game" / "All Payments" in the sidebar.
+- The **host** creates a **Game**: venue, date/time, format (e.g. `6v6`), capacity, and *optionally* a price per spot — it's fine to leave the price blank and set it later (e.g. once you know the actual turf cost).
 - **Players** browse games (filterable by date, time, format, price, spots) and **confirm** a spot, optionally bringing up to 4 guests. There's no online payment — players settle up with the host directly (cash, UPI, etc.).
 - If a game is full, players can **join the waitlist**. When a confirmed player cancels, the longest-waiting eligible waitlisted player is automatically promoted.
 - Cancelling a booking **≥4 hours before kickoff** lets you off the fee; later cancellations still owe it (per the game's cancellation policy) even though the booking itself is cancelled.
 - If a **host cancels a game**, every confirmed player is notified and nobody owes anything.
-- **Hosts mark who's paid**: from "Games You Host" → "Manage Payments" on any game, a host sees every payable player (confirmed, plus late cancellations that still owe), toggles them paid/unpaid, and sees a live running total of amount due / paid / outstanding for that game.
-- **Every player** can see what they owe across all their games on the **Outstanding Payments** page.
+- **Hosts set/update the price and mark who's paid**: from "Games You Host" → "Manage Payments" on any game, the host can set or change the price per spot at any time (recalculating what everyone who hasn't paid yet owes), sees every payable player (confirmed, plus late cancellations that still owe), toggles them paid/unpaid, and sees a live running total of amount due / paid / outstanding for that game.
+- **"All Payments"** (host-only) is a single table of every payable booking across every hosted game, plus a per-player total-owed summary — the at-a-glance ledger.
+- **Every player** sees a "you owe ₹X" banner right on the Browse Games dashboard when they have anything outstanding, and can see the full breakdown on the **Outstanding Payments** page.
 
 ## Getting started
 
@@ -38,12 +41,14 @@ Visit `http://localhost:3000`.
 
 | Email | Role | Notes |
 | --- | --- | --- |
-| `sumeet@example.com` | Host + player | |
-| `kanha@example.com` | Host + player | |
-| `karan@example.com` | Host + player | |
+| `sumeet@example.com` | **Host** + player | The only account that can host games |
+| `kanha@example.com` | Player | |
+| `karan@example.com` | Player | |
 | `player1@example.com` … `player10@example.com` | Player | |
 
-No games are seeded — log in as a host and create one from the **Host a Game** tab, then join it as another account.
+Or use "Create Account" on the login page to sign up your own player account.
+
+No games are seeded — log in as the host and create one from the **Host a Game** tab (price is optional — leave it blank and set it later), then join it as another account.
 
 ## Deploying to Render
 
@@ -58,8 +63,10 @@ This repo includes a `render.yaml` blueprint.
 ## Project layout
 
 - `src/app/(app)/*` — authenticated pages (Browse Games, My Bookings, Cancelled Events, Completed Games, Outstanding Payments, Host, Feedback, FAQ, Notifications, Profile)
-- `src/app/(app)/host/games/[id]` — per-game payment management for hosts
-- `src/app/api/*` — booking, waitlist, cancellation, payment-marking, game creation, feedback endpoints
+- `src/app/(app)/host/games/[id]` — per-game payment management for the host (set/update price, mark paid)
+- `src/app/(app)/host/payments` — host-only ledger of every payable booking across every game
+- `src/app/api/auth/signup` — player account creation
+- `src/app/api/*` — booking, waitlist, cancellation, payment-marking, pricing, game creation, feedback endpoints
 - `src/lib/game.ts` — spots/badge/payment-total computation shared by list and detail views
 - `src/lib/booking.ts` — waitlist promotion logic
 - `prisma/schema.prisma` — data model
@@ -68,5 +75,6 @@ This repo includes a `render.yaml` blueprint.
 ## Notes / next steps for a production version
 
 - No online payment gateway — by design, payments happen off-platform and hosts mark them settled.
-- Auth is a simple seeded credentials flow — swap in a real signup flow + OAuth as needed.
+- Signup is a bare credentials flow (name/email/password, no verification email) — add email verification/OAuth if this goes beyond a private group.
 - No image uploads for venues/games yet; venue "photos" aren't modeled.
+- No self-serve way to promote another account to host — change `HOST_EMAIL` in `prisma/seed.ts` (or edit the DB directly) if that's ever needed.

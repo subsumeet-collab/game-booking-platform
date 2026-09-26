@@ -1,4 +1,5 @@
 import { getServerSession } from "next-auth";
+import Link from "next/link";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { formatGameDate, formatGameTime, gameBadge, spotsLeft, spotsTaken } from "@/lib/game";
@@ -13,6 +14,17 @@ export default async function BrowseGamesPage({
   const session = await getServerSession(authOptions);
   const user = await prisma.user.findUnique({ where: { id: session!.user.id } });
   const city = user?.city ?? "Mumbai";
+
+  const owedAgg = await prisma.booking.aggregate({
+    where: {
+      userId: session!.user.id,
+      paid: false,
+      amountDue: { gt: 0 },
+      OR: [{ status: "CONFIRMED" }, { forfeited: true }],
+    },
+    _sum: { amountDue: true },
+  });
+  const totalOwed = owedAgg._sum.amountDue ?? 0;
 
   const games = await prisma.game.findMany({
     where: { venue: { city }, status: { not: "CANCELLED" } },
@@ -76,11 +88,12 @@ export default async function BrowseGamesPage({
   }
 
   if (format) cards = cards.filter((c) => c.format === format);
-  if (price) cards = cards.filter((c) => c.pricePerSpot <= Number(price));
+  // A TBD price might still end up affordable, so don't filter those out.
+  if (price) cards = cards.filter((c) => c.pricePerSpot === null || c.pricePerSpot <= Number(price));
   if (spots === "available") cards = cards.filter((c) => c.spotsLeft > 0);
 
-  if (sort === "price_low") cards.sort((a, b) => a.pricePerSpot - b.pricePerSpot);
-  else if (sort === "price_high") cards.sort((a, b) => b.pricePerSpot - a.pricePerSpot);
+  if (sort === "price_low") cards.sort((a, b) => (a.pricePerSpot ?? Infinity) - (b.pricePerSpot ?? Infinity));
+  else if (sort === "price_high") cards.sort((a, b) => (b.pricePerSpot ?? -Infinity) - (a.pricePerSpot ?? -Infinity));
   else cards.sort((a, b) => new Date(a.dateISO).getTime() - new Date(b.dateISO).getTime());
 
   const hasLive = cards.some((c) => c.badge === "LIVE");
@@ -95,6 +108,18 @@ export default async function BrowseGamesPage({
       <h1 className="text-4xl font-black mb-6">
         Your Football <span className="text-accent">World</span>
       </h1>
+
+      {totalOwed > 0 && (
+        <Link
+          href="/payments"
+          className="card !py-3 mb-6 flex items-center justify-between border-warn/60 hover:bg-panel2 transition-colors block"
+        >
+          <span className="text-sm">
+            You owe <span className="text-warn font-bold">₹{totalOwed}</span> across your games.
+          </span>
+          <span className="text-sm text-muted">View Outstanding Payments →</span>
+        </Link>
+      )}
 
       <Filters />
 

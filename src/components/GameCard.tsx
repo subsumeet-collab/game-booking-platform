@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { GameBadge } from "@/lib/game";
+import { pricePerSpotLabel } from "@/lib/game";
 import { BookingModal } from "@/components/BookingModal";
 
 export type GameCardData = {
@@ -13,7 +14,7 @@ export type GameCardData = {
   dateLabel: string;
   timeLabel: string;
   format: string;
-  pricePerSpot: number;
+  pricePerSpot: number | null;
   capacity: number;
   spotsTaken: number;
   spotsLeft: number;
@@ -63,7 +64,9 @@ export function GameCard({ game }: { game: GameCardData }) {
             {game.badge === "LIVE" && <span className="w-1.5 h-1.5 rounded-full bg-live inline-block" />}
             {game.badge}
           </span>
-          <span className="text-xl font-black">₹{game.pricePerSpot}</span>
+          <span className={`text-xl font-black ${game.pricePerSpot === null ? "text-muted text-sm uppercase" : ""}`}>
+            {pricePerSpotLabel(game.pricePerSpot)}
+          </span>
         </div>
 
         <h3 className="text-lg font-bold mb-1 truncate" title={game.title}>

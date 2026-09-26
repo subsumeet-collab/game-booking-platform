@@ -29,7 +29,7 @@ export async function tryPromoteWaitlist(gameId: string) {
 
     await prisma.booking.update({
       where: { id: entry.id },
-      data: { status: "CONFIRMED", amountDue: needed * game.pricePerSpot },
+      data: { status: "CONFIRMED", amountDue: game.pricePerSpot === null ? 0 : needed * game.pricePerSpot },
     });
 
     free -= needed;

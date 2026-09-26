@@ -42,7 +42,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
       userId: session.user.id,
       status: "CONFIRMED",
       guestCount,
-      amountDue: needed * game.pricePerSpot,
+      amountDue: game.pricePerSpot === null ? 0 : needed * game.pricePerSpot,
       note,
     },
   });

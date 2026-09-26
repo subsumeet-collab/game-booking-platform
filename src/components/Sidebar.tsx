@@ -50,17 +50,30 @@ export function Sidebar({
           );
         })}
         {user.isHost && (
-          <Link
-            href="/host"
-            className={`flex items-center gap-3 px-5 py-3 text-sm font-medium transition-colors ${
-              pathname.startsWith("/host")
-                ? "bg-panel2 text-accent border-r-2 border-accent"
-                : "text-gray-300 hover:bg-panel2 hover:text-white"
-            }`}
-          >
-            <span>🏟️</span>
-            Host a Game
-          </Link>
+          <>
+            <Link
+              href="/host"
+              className={`flex items-center gap-3 px-5 py-3 text-sm font-medium transition-colors ${
+                pathname === "/host"
+                  ? "bg-panel2 text-accent border-r-2 border-accent"
+                  : "text-gray-300 hover:bg-panel2 hover:text-white"
+              }`}
+            >
+              <span>🏟️</span>
+              Host a Game
+            </Link>
+            <Link
+              href="/host/payments"
+              className={`flex items-center gap-3 px-5 py-3 text-sm font-medium transition-colors ${
+                pathname === "/host/payments"
+                  ? "bg-panel2 text-accent border-r-2 border-accent"
+                  : "text-gray-300 hover:bg-panel2 hover:text-white"
+              }`}
+            >
+              <span>📊</span>
+              All Payments
+            </Link>
+          </>
         )}
       </nav>
 

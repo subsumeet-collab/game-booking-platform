@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { formatGameDate, formatGameTime, payableBookings, paymentTotals } from "@/lib/game";
 import { PaidToggleButton } from "@/components/PaidToggleButton";
+import { SetPriceForm } from "@/components/SetPriceForm";
 
 export default async function ManageGamePaymentsPage({ params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
@@ -29,6 +30,8 @@ export default async function ManageGamePaymentsPage({ params }: { params: { id:
       <p className="text-muted mb-6">
         🏟️ {game.venue.name} · 📍 {game.venue.city} · {formatGameDate(game.date)} · {formatGameTime(game.date)}
       </p>
+
+      <SetPriceForm gameId={game.id} currentPrice={game.pricePerSpot} />
 
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="card text-center !py-4">
@@ -59,10 +62,11 @@ export default async function ManageGamePaymentsPage({ params }: { params: { id:
                   {b.guestCount > 0 && ` + ${b.guestCount} guest${b.guestCount > 1 ? "s" : ""}`}
                 </p>
                 <p className="text-xs text-muted">
-                  {b.status === "CANCELLED" ? "Cancelled late — fee still owed" : "Confirmed"} · ₹{b.amountDue}
+                  {b.status === "CANCELLED" ? "Cancelled late — fee still owed" : "Confirmed"} ·{" "}
+                  {game.pricePerSpot === null ? "price not set" : `₹${b.amountDue}`}
                 </p>
               </div>
-              <PaidToggleButton bookingId={b.id} paid={b.paid} />
+              <PaidToggleButton bookingId={b.id} paid={b.paid} disabled={game.pricePerSpot === null} />
             </div>
           ))}
         </div>

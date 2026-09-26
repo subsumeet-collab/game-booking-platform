@@ -14,7 +14,7 @@ export function CreateGameForm({ defaultCity }: { defaultCity: string }) {
   const [format, setFormat] = useState("6v6");
   const [date, setDate] = useState("");
   const [durationMin, setDurationMin] = useState(60);
-  const [pricePerSpot, setPricePerSpot] = useState(220);
+  const [pricePerSpot, setPricePerSpot] = useState("");
   const [capacity, setCapacity] = useState(12);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -36,7 +36,7 @@ export function CreateGameForm({ defaultCity }: { defaultCity: string }) {
         format,
         date: new Date(date).toISOString(),
         durationMin,
-        pricePerSpot,
+        pricePerSpot: pricePerSpot === "" ? null : Number(pricePerSpot),
         capacity,
       }),
     });
@@ -51,6 +51,7 @@ export function CreateGameForm({ defaultCity }: { defaultCity: string }) {
     setVenueName("");
     setAddress("");
     setDate("");
+    setPricePerSpot("");
     router.refresh();
   }
 
@@ -127,13 +128,14 @@ export function CreateGameForm({ defaultCity }: { defaultCity: string }) {
           />
         </div>
         <div>
-          <label className="block text-xs uppercase text-muted mb-1">Price / Spot (₹)</label>
+          <label className="block text-xs uppercase text-muted mb-1">Price / Spot (₹, optional)</label>
           <input
             type="number"
             className="input"
             min={0}
+            placeholder="Set after the game"
             value={pricePerSpot}
-            onChange={(e) => setPricePerSpot(Number(e.target.value))}
+            onChange={(e) => setPricePerSpot(e.target.value)}
           />
         </div>
         <div>
@@ -148,6 +150,10 @@ export function CreateGameForm({ defaultCity }: { defaultCity: string }) {
           />
         </div>
       </div>
+
+      <p className="text-xs text-muted -mt-2">
+        Don't know the cost yet? Leave price blank and set it later from "Manage Payments" once the game's done.
+      </p>
 
       {error && <p className="text-sm text-danger">{error}</p>}
       {success && <p className="text-sm text-live">Game created!</p>}

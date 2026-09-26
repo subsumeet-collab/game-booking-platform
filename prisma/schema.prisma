@@ -44,7 +44,7 @@ model Game {
   format             String // e.g. "6v6"
   date               DateTime
   durationMin        Int      @default(60)
-  pricePerSpot       Int
+  pricePerSpot       Int? // left blank until the host sets it (often only known after the game)
   capacity           Int
   status             String   @default("UPCOMING")
   cancellationPolicy String   @default("Cancel up to 4 hours before kickoff to be let off the hook for the spot fee. Later cancellations still owe the fee.")

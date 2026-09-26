@@ -51,8 +51,8 @@ export function gameBadge(game: GameWithBookings, now: Date = new Date()): GameB
   return "UPCOMING";
 }
 
-export function pricePerSpotLabel(price: number): string {
-  return `₹${price}`;
+export function pricePerSpotLabel(price: number | null): string {
+  return price === null ? "TBD" : `₹${price}`;
 }
 
 export function formatGameDate(d: Date): string {

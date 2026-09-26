@@ -5,12 +5,15 @@ const prisma = new PrismaClient();
 
 const CITY = "Mumbai";
 const PASSWORD = "password123";
+const HOST_EMAIL = "sumeet@example.com";
 
 async function upsertUser(opts: { name: string; email: string; city?: string; isHost?: boolean }) {
   const passwordHash = await bcrypt.hash(PASSWORD, 10);
   return prisma.user.upsert({
     where: { email: opts.email },
-    update: {},
+    // Re-running the seed against an existing DB should still enforce the single-host rule,
+    // even for accounts created before this became a rule.
+    update: { isHost: opts.isHost ?? false },
     create: {
       name: opts.name,
       email: opts.email,
@@ -30,15 +33,18 @@ async function upsertVenue(name: string, city: string, address: string) {
 async function main() {
   const existingUsers = await prisma.user.count();
   if (existingUsers > 0) {
-    console.log(`Database already has ${existingUsers} user(s) — skipping seed.`);
+    // Still enforce that only HOST_EMAIL is a host, in case old data predates that rule.
+    await prisma.user.updateMany({ where: { email: { not: HOST_EMAIL } }, data: { isHost: false } });
+    await prisma.user.updateMany({ where: { email: HOST_EMAIL }, data: { isHost: true } });
+    console.log(`Database already has ${existingUsers} user(s) — skipped creating demo data, re-checked hosting.`);
     return;
   }
 
   console.log("Seeding…");
 
-  await upsertUser({ name: "Sumeet Kumar", email: "sumeet@example.com", isHost: true });
-  await upsertUser({ name: "Kanha Bhave", email: "kanha@example.com", isHost: true });
-  await upsertUser({ name: "Karan Singh", email: "karan@example.com", isHost: true });
+  await upsertUser({ name: "Sumeet Kumar", email: HOST_EMAIL, isHost: true });
+  await upsertUser({ name: "Kanha Bhave", email: "kanha@example.com" });
+  await upsertUser({ name: "Karan Singh", email: "karan@example.com" });
 
   await Promise.all(
     [
@@ -60,8 +66,8 @@ async function main() {
   await upsertVenue("Nidhivan Turf, Malad", CITY, "Malad West, Mumbai");
 
   console.log("Seed complete — no games seeded, hosts start from a clean slate.");
-  console.log("Demo login: sumeet@example.com / password123 (host)");
-  console.log("Other accounts: kanha@example.com, karan@example.com, player1..10@example.com — all password123");
+  console.log(`Demo login: ${HOST_EMAIL} / password123 (the only host account)`);
+  console.log("Other accounts: kanha@example.com, karan@example.com, player1..10@example.com — all password123, all players");
 }
 
 main()
